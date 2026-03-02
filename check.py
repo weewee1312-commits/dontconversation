@@ -1,21 +1,37 @@
+import os
 import requests
 from bs4 import BeautifulSoup
-import os
 
 URL = "https://ice.dongguk.edu/article/notice/list"
-WEBHOOK = https://discord.com/api/webhooks/1477952168429617203/qMQamCKC9Gzu2kWLwrrCaqXUpEMSNElWKh9TKlv7wzXbETj2so4Y_TKQi4HcucPEms4D
+WEBHOOK = os.environ.get("DISCORD_WEBHOOK", "").strip()
 
 def get_title():
-html = requests.get(URL).text
-soup = BeautifulSoup(html,"html.parser")
-return soup.select_one("table tbody tr td a").text.strip()
+    headers = {"User-Agent": "Mozilla/5.0"}
+    html = requests.get(URL, headers=headers, timeout=20).text
+    soup = BeautifulSoup(html, "html.parser")
+    a = soup.select_one("table tbody tr td a")
+    if not a:
+        raise RuntimeError("공지 목록에서 첫 글을 찾지 못했어요(HTML 구조 변경 가능).")
+    return a.get_text(strip=True)
 
-last=None
-if os.path.exists("last.txt"):
-last=open("last.txt").read()
+def send_discord(msg: str):
+    if not WEBHOOK:
+        raise RuntimeError("DISCORD_WEBHOOK 시크릿이 설정되지 않았어요.")
+    r = requests.post(WEBHOOK, json={"content": msg}, timeout=20)
+    r.raise_for_status()
 
-now=get_title()
+def main():
+    now = get_title()
 
-if last!=now:
-requests.post(WEBHOOK,json={"content":f"새 공지: {now}"})
-open("last.txt","w").write(now)
+    last = None
+    if os.path.exists("last.txt"):
+        with open("last.txt", "r", encoding="utf-8") as f:
+            last = f.read().strip()
+
+    if last != now:
+        send_discord(f"📢 동국대 ICE 새 공지: {now}\n{URL}")
+        with open("last.txt", "w", encoding="utf-8") as f:
+            f.write(now)
+
+if __name__ == "__main__":
+    main()
