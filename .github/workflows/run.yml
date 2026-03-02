@@ -1,0 +1,13 @@
+name: notice-check
+
+on:
+schedule:
+- cron: "*/5 * * * *"
+
+jobs:
+run:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v4
+- run: pip install requests beautifulsoup4
+- run: python check.py
