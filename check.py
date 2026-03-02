@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import os
 
 URL = "https://ice.dongguk.edu/article/notice/list"
-WEBHOOK = "여기에디스코드웹훅붙여넣기"
+WEBHOOK = https://discord.com/api/webhooks/1477952168429617203/qMQamCKC9Gzu2kWLwrrCaqXUpEMSNElWKh9TKlv7wzXbETj2so4Y_TKQi4HcucPEms4D
 
 def get_title():
 html = requests.get(URL).text
