@@ -11,12 +11,12 @@ def get_title():
     soup = BeautifulSoup(html, "html.parser")
     a = soup.select_one("table tbody tr td a")
     if not a:
-        raise RuntimeError("공지 목록에서 첫 글을 찾지 못했어요(HTML 구조 변경 가능).")
+        raise RuntimeError("공지 목록을 찾지 못했어요.")
     return a.get_text(strip=True)
 
-def send_discord(msg: str):
+def send_discord(msg):
     if not WEBHOOK:
-        raise RuntimeError("DISCORD_WEBHOOK 시크릿이 설정되지 않았어요.")
+        raise RuntimeError("DISCORD_WEBHOOK secret이 없음.")
     r = requests.post(WEBHOOK, json={"content": msg}, timeout=20)
     r.raise_for_status()
 
